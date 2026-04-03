@@ -31,7 +31,7 @@ export default function UploadPage() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { "text/csv": [], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [], "application/vnd.ms-excel": [] },
+    accept: { "application/pdf": [], "text/csv": [], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [], "application/vnd.ms-excel": [] },
     maxFiles: 1,
   });
 
@@ -48,7 +48,7 @@ export default function UploadPage() {
         <p className="text-gray-500 text-sm">
           {isDragActive ? "Drop it here..." : "Drag & drop an Excel or CSV file, or click to browse"}
         </p>
-        <p className="text-xs text-gray-400 mt-2">Supported: .xlsx, .xls, .csv</p>
+        <p className="text-xs text-gray-400 mt-2">Supported: .pdf, .xlsx, .xls, .csv</p>
       </div>
 
       {loading && <p className="mt-4 text-brand animate-pulse">Analyzing...</p>}

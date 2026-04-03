@@ -9,15 +9,17 @@ export async function POST(req: NextRequest) {
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
     const ext = file.name.split(".").pop()?.toLowerCase();
-    if (!["csv", "xlsx", "xls"].includes(ext ?? "")) {
-      return NextResponse.json({ error: "Only CSV and Excel files supported" }, { status: 400 });
+    if (!["csv", "xlsx", "xls", "pdf"].includes(ext ?? "")) {
+      return NextResponse.json({ error: "Only PDF, CSV and Excel files supported" }, { status: 400 });
     }
 
     const buffer = await file.arrayBuffer();
-    const financialData = parseFile(buffer, file.name);
+    const financialData = await parseFile(buffer, file.name);
 
     if (Object.keys(financialData).length === 0) {
-      return NextResponse.json({ error: "No recognizable financial data found in file" }, { status: 422 });
+      return NextResponse.json({
+        error: "No recognizable financial data found. Make sure your file has labeled rows like 'Revenue', 'Net Income', 'Total Assets', etc.",
+      }, { status: 422 });
     }
 
     const result = analyze(financialData);
