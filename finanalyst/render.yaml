@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: finanalyst-backend
+    runtime: python
+    rootDir: finanalyst/backend
+    buildCommand: pip install -r requirements.txt && cd ml && python train.py && cd ..
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MODEL_PATH
+        value: ./ml/model.pkl
+      - key: FRONTEND_URL
+        value: https://finanalyst.vercel.app
