@@ -1,41 +1,41 @@
 "use client";
-import type { Ratios } from "@/lib/ratios";
+import clsx from "clsx";
+import type { RatioDetail } from "@/lib/ratios";
 
-const LABELS: Record<keyof Ratios, string> = {
-  net_profit_margin: "Net Profit Margin (%)",
-  roa: "Return on Assets (%)",
-  roe: "Return on Equity (%)",
-  current_ratio: "Current Ratio",
-  quick_ratio: "Quick Ratio",
-  debt_to_equity: "Debt-to-Equity",
-  asset_turnover: "Asset Turnover",
-  operating_cf_positive: "Positive Operating Cash Flow",
+const statusStyles = {
+  good: "bg-green-100 text-green-800",
+  warning: "bg-yellow-100 text-yellow-800",
+  bad: "bg-red-100 text-red-800",
+  neutral: "bg-gray-100 text-gray-700",
 };
+const statusIcons = { good: "✅", warning: "⚠️", bad: "❌", neutral: "ℹ️" };
 
-export default function RatiosTable({ ratios }: { ratios: Ratios }) {
+export default function RatiosTable({ ratioDetails }: { ratioDetails: Record<string, RatioDetail> }) {
   return (
-    <div className="mt-6 overflow-x-auto">
-      <h2 className="text-lg font-semibold text-brand mb-3">Financial Ratios</h2>
-      <table className="w-full text-sm border-collapse">
-        <thead>
-          <tr className="bg-brand text-white">
-            <th className="text-left px-4 py-2">Ratio</th>
-            <th className="text-right px-4 py-2">Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {(Object.keys(LABELS) as (keyof Ratios)[]).map((key, i) => {
-            const val = ratios[key];
-            const display = typeof val === "boolean" ? (val ? "Yes" : "No") : typeof val === "number" ? val.toFixed(2) : "—";
-            return (
-              <tr key={key} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                <td className="px-4 py-2">{LABELS[key]}</td>
-                <td className="px-4 py-2 text-right font-mono">{display}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className="mt-6">
+      <h2 className="text-lg font-semibold text-brand mb-3">Ratio Breakdown & Insights</h2>
+      <div className="space-y-3">
+        {Object.entries(ratioDetails).map(([key, detail]) => {
+          const display =
+            typeof detail.value === "boolean"
+              ? detail.value ? "Yes" : "No"
+              : `${(detail.value as number).toFixed(2)}${key.includes("margin") || key === "roa" || key === "roe" ? "%" : ""}`;
+          return (
+            <div key={key} className="bg-white rounded-xl border p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-gray-800 text-sm">{detail.label}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold text-gray-900">{display}</span>
+                  <span className={clsx("text-xs px-2 py-0.5 rounded-full font-medium", statusStyles[detail.status])}>
+                    {statusIcons[detail.status]} {detail.status.charAt(0).toUpperCase() + detail.status.slice(1)}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 leading-relaxed">{detail.insight}</p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

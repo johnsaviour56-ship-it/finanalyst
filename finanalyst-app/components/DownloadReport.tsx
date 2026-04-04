@@ -35,6 +35,21 @@ export default function DownloadReport({ companyName, ratios, score, prediction,
     const lines = doc.splitTextToSize(explanation, 180);
     doc.text(lines, 14, 52);
 
+    // Reasons
+    let y = 52 + lines.length * 5 + 4;
+    if (reasons?.length) {
+      doc.setFontSize(11);
+      doc.setTextColor(30, 58, 95);
+      doc.text("Why this prediction:", 14, y); y += 6;
+      doc.setFontSize(9);
+      doc.setTextColor(60, 60, 60);
+      for (const r of reasons) {
+        const rLines = doc.splitTextToSize(`→ ${r}`, 180);
+        doc.text(rLines, 14, y); y += rLines.length * 5;
+      }
+      y += 4;
+    }
+
     const tableRows = [
       ["Net Profit Margin (%)", ratios.net_profit_margin.toFixed(2)],
       ["Return on Assets (%)", ratios.roa.toFixed(2)],
@@ -47,7 +62,7 @@ export default function DownloadReport({ companyName, ratios, score, prediction,
     ];
 
     autoTable(doc, {
-      startY: 65,
+      startY: y,
       head: [["Ratio", "Value"]],
       body: tableRows,
       headStyles: { fillColor: [30, 58, 95] },

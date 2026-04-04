@@ -83,9 +83,9 @@ export default function ManualPage() {
       {error && <p className="mt-4 text-red-600">{error}</p>}
       {result && (
         <>
-          <ResultCard prediction={result.prediction} score={result.score} explanation={result.explanation} />
+          <ResultCard {...result} />
           <RatiosChart ratios={result.ratios} />
-          <RatiosTable ratios={result.ratios} />
+          <RatiosTable ratioDetails={result.ratioDetails} />
           <DownloadReport companyName={companyName} {...result} />
         </>
       )}
