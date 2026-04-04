@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import yahooFinance from "yahoo-finance2";
+import { getQuote } from "@/lib/yahoo";
 import { NGX_TICKERS } from "@/lib/market";
 
-// Fetch top NGX stocks overview
 export async function GET() {
   try {
-    const tickers = Object.values(NGX_TICKERS).slice(0, 20);
+    const entries = Object.entries(NGX_TICKERS).slice(0, 20);
 
     const results = await Promise.allSettled(
-      tickers.map(t => yahooFinance.quote(t))
+      entries.map(([, yTicker]) => getQuote(yTicker))
     );
 
     const stocks = results
@@ -16,22 +15,22 @@ export async function GET() {
         if (r.status !== "fulfilled") return null;
         const q = r.value;
         return {
-          ticker: tickers[i],
-          shortCode: Object.keys(NGX_TICKERS)[i],
-          name: q.longName ?? q.shortName ?? tickers[i],
-          price: q.regularMarketPrice ?? 0,
-          change: q.regularMarketChange ?? 0,
-          changePct: q.regularMarketChangePercent ?? 0,
-          volume: q.regularMarketVolume ?? 0,
-          marketCap: q.marketCap ?? 0,
-          pe: q.trailingPE ?? null,
+          ticker: entries[i][1],
+          shortCode: entries[i][0],
+          name: q.name,
+          price: q.price,
+          change: q.change,
+          changePct: q.changePct,
+          volume: q.volume,
+          marketCap: q.marketCap,
+          pe: null,
         };
       })
       .filter(Boolean);
 
-    const gainers = [...stocks].sort((a, b) => (b!.changePct - a!.changePct)).slice(0, 5);
-    const losers = [...stocks].sort((a, b) => (a!.changePct - b!.changePct)).slice(0, 5);
-    const mostActive = [...stocks].sort((a, b) => (b!.volume - a!.volume)).slice(0, 5);
+    const gainers = [...stocks].sort((a, b) => b!.changePct - a!.changePct).slice(0, 5);
+    const losers = [...stocks].sort((a, b) => a!.changePct - b!.changePct).slice(0, 5);
+    const mostActive = [...stocks].sort((a, b) => b!.volume - a!.volume).slice(0, 5);
 
     return NextResponse.json({ stocks, gainers, losers, mostActive, updatedAt: new Date().toISOString() });
   } catch (e: any) {

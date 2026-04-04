@@ -18,9 +18,7 @@
     "xlsx": "^0.18.5",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
-    "pdf-parse": "^1.1.1",
-    "yahoo-finance2": "^2.11.3",
-    "cheerio": "^1.0.0"
+    "pdf-parse": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^20",
