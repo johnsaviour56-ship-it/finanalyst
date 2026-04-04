@@ -1,21 +1,29 @@
-import webpack from "webpack";
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
-    // Ignore optional test-only deps that yahoo-finance2 references
-    config.plugins.push(
-      new webpack.IgnorePlugin({
-        resourceRegExp: /fetch-mock-cache/,
-      })
-    );
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
       path: false,
       stream: false,
+      crypto: false,
     };
+
+    // Suppress optional test-only deps in yahoo-finance2
+    config.externals = [
+      ...(Array.isArray(config.externals) ? config.externals : []),
+      ({ request }, callback) => {
+        if (request && request.includes("fetch-mock-cache")) {
+          return callback(null, "commonjs " + request);
+        }
+        callback();
+      },
+    ];
+
     return config;
+  },
+  experimental: {
+    serverComponentsExternalPackages: ["yahoo-finance2", "pdf-parse"],
   },
 };
 
